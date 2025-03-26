@@ -88,12 +88,12 @@ function loadArticles(category, containerId) {
         // Ensure the image URL is using the export=view format
         let validImageUrl = article.image ? article.image : 'default-image.jpg';
         
-if (validImageUrl.includes("drive.google.com")) {
-    validImageUrl = validImageUrl
-        .replace("/file/d/", "/thumbnail?id=") // Convert to export format
-        .replace("/view", "") // Remove "/view" if it exists
-        .replace("/preview", "&sz=s1000"); // Remove "/preview" if it exists
-}
+        if (validImageUrl.includes("drive.google.com")) {
+            validImageUrl = validImageUrl
+                .replace("/file/d/", "/thumbnail?id=") // Convert to export format
+                .replace("/view", "") // Remove "/view" if it exists
+                .replace("/preview", "&sz=s1000"); // Remove "/preview" if it exists
+        }
 
         articleDiv.innerHTML = `
             <div class="image-container">
@@ -145,7 +145,6 @@ function loadArticlePage() {
 
 // Fetch articles when the page loads
 document.addEventListener('DOMContentLoaded', fetchArticles);
-
 
 // Hamburger Menu Functionality
 function setupHamburgerMenu() {
