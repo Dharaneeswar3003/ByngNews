@@ -1,26 +1,45 @@
 let articles = [];
 
-// Fetch articles from Google Apps Script API
-async function fetchArticles() {
+// Fetch articles using XMLHttpRequest
+function fetchArticles() {
     try {
         // Check if articles are already cached in localStorage
         const cachedArticles = localStorage.getItem('articles');
-        
+
         if (cachedArticles) {
             articles = JSON.parse(cachedArticles);
             console.log("Articles loaded from cache.");
+            // Call handlePageLoad after articles are fetched and available
+            handlePageLoad();
         } else {
-            // Fetch the articles from the API
-            const response = await fetch("https://script.google.com/macros/s/AKfycbwcuagtwil510vmK3rUieZjkgKwqcjlJOmd1nRBtF8eK5gDdK0hl4sFw2beUTt9ulHv/exec");
-            articles = await response.json();
+            // Create a new XMLHttpRequest object
+            const xhr = new XMLHttpRequest();
             
-            // Store the articles in localStorage for future use
-            localStorage.setItem('articles', JSON.stringify(articles));
-            console.log("Articles fetched from server and cached.");
-        }
+            // Open a GET request to the API endpoint
+            xhr.open('GET', "https://script.google.com/macros/s/AKfycbwcuagtwil510vmK3rUieZjkgKwqcjlJOmd1nRBtF8eK5gDdK0hl4sFw2beUTt9ulHv/exec", true);
+            
+            // Set up the onload event handler for successful response
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    articles = JSON.parse(xhr.responseText);
+                    // Store the articles in localStorage for future use
+                    localStorage.setItem('articles', JSON.stringify(articles));
+                    console.log("Articles fetched from server and cached.");
+                    // Call handlePageLoad after articles are fetched and available
+                    handlePageLoad();
+                } else {
+                    console.error("Error fetching articles: " + xhr.statusText);
+                }
+            };
 
-        // Call handlePageLoad after articles are fetched and available
-        handlePageLoad();
+            // Set up the onerror event handler in case of failure
+            xhr.onerror = function() {
+                console.error("Network error occurred while fetching articles.");
+            };
+
+            // Send the request
+            xhr.send();
+        }
 
     } catch (error) {
         console.error("Error fetching articles:", error);
